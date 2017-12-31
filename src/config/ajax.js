@@ -1,4 +1,4 @@
-export default (type='GET', url='', data={}, async=true) => {
+export default (type='GET', url='', data={}, upload=false, async=true) => {
 	return new Promise((resolve, reject) => { //定义一个promise
 		type = type.toUpperCase();
 
@@ -21,8 +21,14 @@ export default (type='GET', url='', data={}, async=true) => {
 			requestObj.send();
 		}else if (type == 'POST') {
 			requestObj.open(type, url, async);
-			requestObj.setRequestHeader("Content-type", "multipart/form-data");
-			requestObj.send(data);
+      if(upload === false){
+        requestObj.setRequestHeader("Content-type", "application/json");
+        requestObj.send(JSON.stringify(data));
+      }
+      if(upload === true){
+        requestObj.setRequestHeader("Content-type", "multipart/form-data");
+        requestObj.send(data);
+      }
 		}else {
 			reject('error type');
 		}

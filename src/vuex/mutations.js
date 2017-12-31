@@ -4,7 +4,12 @@ const state = {
   visibleSubmit: false,
   visibleUploadSuccess: false,
   visiblePhotoWall: false,
-  tbId: null
+  mixNick: null,
+  tbId: null,
+  currentUploadFile: {
+    images: null,
+    type: null
+  }
 }
 const mutations = {
   [type.SET_VISIBLE_UPLOAD] (state, data) {
@@ -16,11 +21,20 @@ const mutations = {
   [type.SET_VISIBLE_UPLOAD_SUCCESS] (state, data) {
     state.visibleUploadSuccess = data
   },
-  [type.TAO_BAO_ID] (state, data) {
+  [type.SET_MIX_NICK] (state, data) {
+    state.mixNick = data
+  },
+  [type.SET_TB_ID] (state, data) {
     state.tbId = data
   },
   [type.PHOTO_WALL] (state, data) {
     state.visiblePhotoWall = data
+  },
+  [type.CURRENT_UPLOAD_FILE] (state, id, uploadType) {
+    state.currentUploadFile = {
+      images: id,
+      type: uploadType
+    }
   }
 }
 export default {

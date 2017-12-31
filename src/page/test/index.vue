@@ -1,13 +1,14 @@
 <template>
   <div class="container">
-    <button @click="setVisible('SET_VISIBLE_UPLOAD', visibleUpload)">打开上传</button>
-    <button @click="setVisible('SET_VISIBLE_SUBMIT', visibleSubmit)">打开提交</button>
-    <button @click="setVisible('SET_VISIBLE_UPLOAD_SUCCESS', visibleUploadSuccess)">打开上传成功</button>
+    <button @click="setVisible('SET_VISIBLE_UPLOAD', visibleUpload, true)">打开上传</button>
+    <button @click="setVisible('SET_VISIBLE_SUBMIT', visibleSubmit, true)">打开提交</button>
+    <button @click="setVisible('SET_VISIBLE_UPLOAD_SUCCESS', visibleUploadSuccess, true)">打开上传成功</button>
+    <button @click="setVisible('PHOTO_WALL', visiblePhotoWall, true)">打开照片墙</button>
     <!--<input type="file" accept="image/*,video/*">-->
     <upload></upload>
     <submit></submit>
     <upload-success></upload-success>
-    <!--<photo-wall></photo-wall>-->
+    <photo-wall></photo-wall>
   </div>
 </template>
 <script>
@@ -21,7 +22,8 @@
       ...mapGetters({
         visibleUpload: 'visibleUpload',
         visibleSubmit: 'visibleSubmit',
-        visibleUploadSuccess: 'visibleUploadSuccess'
+        visibleUploadSuccess: 'visibleUploadSuccess',
+        visiblePhotoWall: 'visiblePhotoWall'
       })
     },
   	components: {
@@ -36,16 +38,20 @@
       }
     },
     methods: {
-      setVisible (type, visible_type) {
-        visible_type = true
-        this.$store.commit(type, true)
+      setVisible (type, visible_type, isVisible) {
+        visible_type = isVisible
+        this.$store.commit(type, isVisible)
       }
+    },
+    mounted () {
+
     }
   }
 </script>
 <style lang="less">
   .container{
     height:1000px;
+    position: relative;
   }
 </style>
 

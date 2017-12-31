@@ -12,9 +12,20 @@
         <!--</ul>-->
       </div>
       <div class="photo-body">
-        <div class="left"></div>
-        <div class="right"></div>
+        <div class="left">
+          <img src="../../images/111.jpg" alt="" @click="viewImage">
+          <img src="../../images/222.jpg" alt="" @click="viewImage">
+          <img src="../../images/333.jpg" alt="">
+          <img src="../../images/111.jpg" alt="">
+        </div>
+        <div class="right">
+          <img src="../../images/333.jpg" alt="">
+          <img src="../../images/111.jpg" alt="">
+        </div>
       </div>
+    </div>
+    <div class="view-image" v-if="showViewImage" ref="showViewImage">
+      <img :src="currentSrc" alt="" @click="closeViewImage">
     </div>
   </div>
 </template>
@@ -25,6 +36,12 @@
       ...mapGetters({
         visiblePhotoWall: 'visiblePhotoWall',
       })
+    },
+    data () {
+      return {
+        currentSrc: null,
+        showViewImage: false
+      }
     },
     watch: {
       visiblePhotoWall (newval, oldval) {
@@ -46,6 +63,26 @@
           this.visiblePhotoWall = false
           this.$store.commit('PHOTO_WALL', false)
         },1000)
+      },
+      viewImage () {
+        let event = window.event
+        this.showViewImage = true
+        this.currentSrc = event.target.src
+        this.$nextTick(()=>{
+          setTimeout(()=> {
+            this.$refs.showViewImage.style.opacity = 1
+            this.$refs.showViewImage.style.background = 'rgba(0,0,0,.7)'
+            this.$refs.showViewImage.style.transition = 'all 1s'
+          },0)
+        })
+      },
+      closeViewImage () {
+        this.$refs.showViewImage.style.opacity = 0
+        this.$refs.showViewImage.style.background = 'rgb(255,255,255)'
+        this.$refs.showViewImage.style.transition = 'all 1s'
+        setTimeout(()=> {
+          this.showViewImage = false
+        },1000)
       }
     }
   }
@@ -54,7 +91,7 @@
   .photo-container{
     opacity: 0;
     background: #fff;
-    position: fixed;
+    position: absolute;
     min-height: 100%;
     top:0;
     left:0;
@@ -99,12 +136,27 @@
     }
     .left,.right{
       width:2.86rem;
-      background: red;
-      height:100px;
       img{
         width:100%;
         display: block;
         margin-bottom: .36rem;
+      }
+    }
+    .view-image{
+      position: fixed;
+      opacity: 0;
+      width:100%;
+      height:100%;
+      top:0;
+      left:0;
+      background: #fff;
+      img{
+        width:100%;
+        display: block;
+        position: absolute;
+        top:50%;
+        left:0;
+        transform: translate(0,-50%);
       }
     }
   }

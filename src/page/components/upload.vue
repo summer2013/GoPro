@@ -15,14 +15,14 @@
       </div>
       <div class="upload-footer">
         <div class="upload-footer-top">
-          <p><img src="../../images/heart.png" alt=""><span>999</span></p>
+          <p><img src="../../images/heart.png" alt="" @click="like"><span>999</span></p>
           <p>
             <ul>
               <li></li>
               <li></li>
               <li></li>
             </ul>
-            <span @click="explore">更多</span>
+            <span @click="setVisible('PHOTO_WALL', visiblePhotoWall, true)">更多</span>
           </p>
         </div>
         <p>探索长滩海滩</p>
@@ -32,26 +32,31 @@
       </div>
     </div>
     <photo-wall></photo-wall>
+    <submit></submit>
   </div>
 </template>
-<script>
+<script type="text/ecmascript-6">
   import Service from '../../config/service'
   import photoWall from './photo-wall'
+  import submit from './submit'
   import { mapGetters } from 'vuex'
   export default {
     components: {
-      photoWall
+      photoWall,
+      submit
     },
     data () {
   		return {
         imgList: ['/static/img/111.jpg', '/static/img/222.jpg', '/static/img/333.jpg'],
-        index: 0
+        index: 0,
+        type: null
       }
     },
     computed: {
       ...mapGetters({
         visibleUpload: 'visibleUpload',
-        visiblePhotoWall: 'visiblePhotoWall'
+        visiblePhotoWall: 'visiblePhotoWall',
+        visibleSubmit: 'visibleSubmit'
       })
     },
     watch: {
@@ -69,11 +74,20 @@
     methods: {
       async uploadFile (data) {
     		const res = await Service.uploadFile(data)
-        if(!res || res.message.toString() !== 'Success') {
+        if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
     			alert('上传失败')
           return
         }
-        alert('上传成功')
+        this.$store.commit('CURRENT_UPLOAD_FILE', res.data.id, this.type)
+        this.setVisible('SET_VISIBLE_SUBMIT', this.visibleSubmit, true)
+      },
+      async likePhoto (data) {
+        const res = await Service.likePhoto(data)
+        if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
+          alert('点赞失败')
+          return
+        }
+        alert('点赞成功')
       },
       init () {
         this.$refs.imgContainer.style.width = 6.15 * (this.imgList.length + 1) + 'rem'
@@ -119,20 +133,40 @@
         let formData = new FormData();
         formData.append('file', event.target.files[0]);
         if(event.target.files[0].type.includes('image') || event.target.files[0].type.includes('video')){
+          this.type = event.target.files[0].type.includes('image') ? 'image' : 'video'
           this.uploadFile(formData)
         }else{
         	alert('只能选择图片或者视频')
         }
       },
-      explore () {
-      	this.visiblePhotoWall = true
-        this.$store.commit('PHOTO_WALL', true)
+      setVisible (type, visible_type, isVisible) {
+        visible_type = isVisible
+        this.$store.commit(type, isVisible)
+      },
+      like () {
+
+      },
+      getNickId () {
+        Tida.doAuth(function(data){
+          if(data.finish){
+            let options = {
+              sellerNick: "yywzs007"
+            }
+            Tida.mixNick(options, function (data) {
+              this.$store.commit('SET_MIX_NICK', data.mixnick)
+              alert(data.mixnick)
+            })
+          }else {
+            alert('请登录后再进入活动')
+          }
+        })
       }
     },
     mounted () {
       this.$nextTick(()=>{
         this.init()
       })
+      this.getNickId()
     }
   }
 </script>

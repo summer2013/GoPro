@@ -7,14 +7,22 @@
       <span>{{errorInfo}}</span>
       <p @click="submit()">提交</p>
     </div>
+    <upload-success></upload-success>
   </div>
 </template>
-<script>
+<script type="text/ecmascript-6">
   import { mapGetters } from 'vuex'
+  import uploadSuccess from './upload-success'
   export default {
+    components: {
+      uploadSuccess
+    },
     computed: {
       ...mapGetters({
         visibleSubmit: 'visibleSubmit',
+        mixNick: 'mixNick',
+        currentUploadFile: 'currentUploadFile',
+        visibleUploadSuccess: 'visibleUploadSuccess',
         tbId: 'tbId'
       })
     },
@@ -34,10 +42,32 @@
       return {
       	taoBaoId: null,
         shareContent: '',
-        errorInfo:''
+        errorInfo:'',
+        disableTbId: false
       }
     },
     methods: {
+      async saveRecord (data) {
+        const res = await Service.saveRecord(data)
+        if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
+          alert('保存上传记录失败')
+          return
+        }
+        this.setVisible('SET_VISIBLE_SUBMIT', this.visibleSubmit, false)
+        this.setVisible('SET_VISIBLE_UPLOAD_SUCCESS', this.visibleUploadSuccess, true)
+      },
+      async getUserInfo (data) {
+        const res = await Service.getUserInfo(data)
+        if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
+          alert('获取用户信息失败')
+          return
+        }
+        if(res.data.name) {
+          this.taoBaoId = res.data.name
+          this.$store.commit('SET_TB_ID', this.taoBaoId)
+          //this.disableTbId = true
+        }
+      },
       closeModal () {
         this.$refs.modal.style.opacity = 0
         this.$refs.modal.style.transition = '1s'
@@ -46,20 +76,38 @@
           this.$store.commit('SET_VISIBLE_SUBMIT', false)
         },1000)
       },
+      setVisible (type, visible_type, isVisible) {
+        visible_type = isVisible
+        this.$store.commit(type, isVisible)
+      },
       submit () {
       	if(!this.taoBaoId){
           this.errorInfo = '淘宝ID不能为空'
           return
         }
-        this.$store.commit('TAO_BAO_ID', this.taoBaoId)
+        this.$store.commit('SET_TB_ID', this.taoBaoId)
         if(!this.shareContent){
           this.errorInfo = '分享感受不能为空'
           return
         }
+        let params = {
+          images: this.currentUploadFile.images,
+          nick: this.mixNick,
+          name: this.taoBaoId,
+          content: this.shareContent,
+          area: null,
+          type: this.currentUploadFile.type
+        }
+        this.saveRecord(params)
       }
     },
     mounted () {
-      this.taoBaoId = this.tbId
+      if (this.tbId === null) {
+        this.getUserInfo({nick: this.mixNick})
+      } else {
+        this.taoBaoId = this.tbId
+        //this.disableTbId = true
+      }
     }
   }
 </script>
