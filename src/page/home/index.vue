@@ -33,7 +33,8 @@
           <img class="map" src="../../images/bg.jpg" alt="">
           <div v-show="!hideMapElement" :class="'map-hot-' + (index+1)" v-for="(item,index) in hots" @click="tapHot" :key="index">
             <img v-bind:data-idx="index+1" :ref="'mh' + (index+1)" v-bind:class="{bigger: biggerIdx == (index+1)}" :src="item.url" @click="openUpload(biggerIdx == (index+1))">
-            <div class="sprite" v-bind:class="{'sprite-bigger': biggerIdx == (index+1)}"></div>
+            <!-- <div class="sprite" v-bind:class="{'sprite-bigger': biggerIdx == (index+1)}"></div> -->
+            <div class="sprite"></div>
             <!-- <div v-show="biggerIdx != (index+1)" class="sprite"></div> -->
             <!-- <div v-show="biggerIdx == (index+1)" class="sprite-bigger"></div> -->
           </div>
@@ -83,21 +84,21 @@ export default {
       preLoaded: false, // 预加载是否完成
       isMobile: true,
       hots: [
-        {url: require("../../images/mg.png"), selected: false, text:"W 118°14 洛杉矶"},
-        {url: require("../../images/mg.png"), selected: false, text: "W 74°0 纽约"},
-        {url: require("../../images/agt.png"), selected: false, text: "E 12°10 阿根廷"},
-        {url: require("../../images/ld.png"), selected: false, text: "W 0° 7 伦敦"},
-        {url: require("../../images/rd.png"), selected: false, text: "E 18°03 瑞典"},
-        {url: require("../../images/ydl.png"), selected: false, text: "E 11°15 意大利"},
-        {url: require("../../images/teq.png"), selected: false, text: "E 32°54 土耳其"},
-        {url: require("../../images/kny.png"), selected: false, text: "E 36°49 肯尼亚"},
-        {url: require("../../images/db.png"), selected: false, text: "E 55°18 阿拉伯联合酋长国"},
-        {url: require("../../images/pj.png"), selected: false, text: "E 98°20 普吉岛"},
-        {url: require("../../images/zg.png"), selected: false, text: "E 104°21 中国"},
-        {url: require("../../images/bld.png"), selected: false, text: "E 115° 14'E 巴厘岛"},
-        {url: require("../../images/ct.png"), selected: false, text: "E 114°37 长滩"},
-        {url: require("../../images/dj.png"), selected: false, text: "E 139°69 日本"},
-        {url: require("../../images/adly.png"), selected: false, text: "E 150°53 澳大利亚"}
+        {url: require("../../images/mg.png"), selected: false, text:"W 118°14 洛杉矶", id: 5},
+        {url: require("../../images/mg.png"), selected: false, text: "W 74°0 纽约", id: 6},
+        {url: require("../../images/agt.png"), selected: false, text: "E 12°10 阿根廷", id:4},
+        {url: require("../../images/ld.png"), selected: false, text: "W 0° 7 伦敦", id:14},
+        {url: require("../../images/rd.png"), selected: false, text: "E 18°03 瑞典", id:13},
+        {url: require("../../images/ydl.png"), selected: false, text: "E 11°15 意大利", id:8},
+        {url: require("../../images/teq.png"), selected: false, text: "E 32°54 土耳其", id:7},
+        {url: require("../../images/kny.png"), selected: false, text: "E 36°49 肯尼亚", id:2},
+        {url: require("../../images/db.png"), selected: false, text: "E 55°18 阿拉伯联合酋长国", id:3},
+        {url: require("../../images/pj.png"), selected: false, text: "E 98°20 普吉岛", id:10},
+        {url: require("../../images/zg.png"), selected: false, text: "E 104°21 中国", id:11},
+        {url: require("../../images/bld.png"), selected: false, text: "E 115° 14'E 巴厘岛", id:9},
+        {url: require("../../images/ct.png"), selected: false, text: "E 114°37 长滩", id:15},
+        {url: require("../../images/dj.png"), selected: false, text: "E 139°69 日本", id:12},
+        {url: require("../../images/adly.png"), selected: false, text: "E 150°53 澳大利亚", id:1}
       ]
     }
   },
@@ -153,9 +154,6 @@ export default {
             if (el && that.biggerIdx != el.dataset.idx && that.elementInViewport(el)) {
               that.biggerIdx = el.dataset.idx
               console.log('happy!', that.biggerIdx)
-            } else if(el && that.biggerIdx == el.dataset.idx){
-              that.biggerIdx = undefined
-              console.log('to small!')
             }
           }
           // console.log(window.scrollX > that.preScrollX)
@@ -174,7 +172,7 @@ export default {
       // var diff = (rect.left + el.width/2) - (window.innerWidth/2 || document.documentElement.clientWidth/2)
       console.log('xxx->', rect.left, window.innerWidth/2 )
       //return diff <= 2 && diff >= -2
-      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width
+      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width/2
     },
     async getHotCities() {
       console.log('111res->')
@@ -209,7 +207,7 @@ export default {
 .bigger {
   transform: scale(4);
   transform-origin: bottom;
-  transition: all 1s;
+  transition: all .5s;
 }
 
 #app,
@@ -323,11 +321,11 @@ export default {
 }
 
 .bottom-dialog {
-  width: 6.36rem;
-  height: 2.9rem;
+  width: 6.26rem;
+  height: 2.15rem;
   position: fixed;
-  bottom: 0.63rem;
-  background: url("../../images/dialog2.png") 100% 100% no-repeat;
+  bottom: 0.3rem;
+  background: url("../../images/bottom-dialog.png") 100% 100% no-repeat;
   background-size: contain;
   font-size: 0.56rem;
   z-index: 2;
@@ -365,7 +363,9 @@ export default {
   // background-size: contain;
   // background-repeat: no-repeat;
   display: flex;
+  display: -webkit-flex;
   justify-content: center;
+  -webkit-justify-content: center;
   // transition: 1s transform ease-in;
   z-index: 3;
 }
@@ -409,10 +409,10 @@ export default {
   animation: breathing 2s ease-out normal;
 }
 
-@tops: 5.36rem, 5.06rem, 9.39rem, 4.09rem, 3.03rem, 4.95rem, 5.11rem, 7.3rem,
+@tops: 5.36rem, 5.06rem, 8.7rem, 4.09rem, 3.03rem, 4.95rem, 5.11rem, 7.3rem,
   6.05rem, 6.85rem, 5.63rem, 7.79rem, 6.52rem, 5.23rem, 8.68rem;
 
-@lefts: 3.69rem, 5.97rem, 6.43rem, 9.92rem, 10.81rem, 10.79rem, 11.73rem, 11.98rem,
+@lefts: 3.69rem, 5.97rem, 6.6rem, 9.92rem, 10.81rem, 10.79rem, 11.73rem, 11.98rem,
   12.98rem, 15.4rem, 15.87rem, 16.08rem, 16.61rem, 17.39rem, 18.12rem;
 .loop(@n) when (@n < 16) {
   @mp-top: extract(@tops, @n);
@@ -431,7 +431,7 @@ export default {
 .line {
   // border: 1px solid #91a6bb;
   width: 2px;
-  height: 8.6rem;
+  height: 10rem;
   position: fixed;
   z-index: 1;
   top: .68rem;
@@ -470,7 +470,8 @@ export default {
   left: 20%;
 }
 
-@spriteWidth: 10vw; // 精灵宽度
+// @spriteWidth: 10vw; // 精灵宽度
+@spriteWidth: 40px; // 精灵宽度
 // @spriteWidth: 40px; // 精灵宽度
 @keyframes run {
   0% {
@@ -482,15 +483,16 @@ export default {
 }
 .sprite {
   width: @spriteWidth;
-  height: 5vw;
-  // height: 20px;
+  // height: 5vw;
+  // height: 2.6vw;
+  height: 20px;
   background: url("../../images/sprite.png") 0 0 no-repeat;
   animation: run 1.2s steps(15) infinite;
   background-size: cover;
   z-index: 1;
   width: @spriteWidth;
   position: absolute;
-  bottom: -3.75vw;
+  bottom: -4.75vw;
   // bottom: -15px;
   transition: all 1s;
 }
