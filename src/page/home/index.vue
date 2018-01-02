@@ -26,10 +26,10 @@
         </div>
         <div v-bind:class="{hide: hideMapElement}" class="line h-center"></div>
         <p v-bind:class="{hide: hideMapElement}" class="position-text">{{biggerIdx && hots[biggerIdx-1].text}}</p>
-        <div v-bind:class="{hide: hideMapElement}" class="small-map h-center">
-          <div class="small-map-position"></div>
+        <div v-bind:class="{hide: hideMapElement}" class="small-map h-center" ref="smallMap">
+          <div class="small-map-position" v-bind:style="{left: offsetLeft+'%'}"></div>
         </div>
-        <div class="map-container">
+        <div class="map-container" ref="mapContainer">
           <img class="map" src="../../images/bg.jpg" alt="">
           <div v-show="!hideMapElement" :class="'map-hot-' + (index+1)" v-for="(item,index) in hots" @click="tapHot" :key="index">
             <img v-bind:data-idx="index+1" :ref="'mh' + (index+1)" v-bind:class="{bigger: biggerIdx == (index+1)}" :src="item.url" @click="openUpload(biggerIdx == (index+1))">
@@ -74,7 +74,7 @@ export default {
       selectedIdx: 0,
       loadedCount: 0,
       biggerIdx: undefined,
-      offsetLeft: 0,
+      offsetLeft: 13,
       urls: [
         require("../../images/bg.jpg"),
         require("../../images/bg1.jpg"),
@@ -156,28 +156,23 @@ export default {
               console.log('happy!', that.biggerIdx)
             }
           }
-          // console.log(window.scrollX > that.preScrollX)
           that.scrollDirection = window.scrollX > that.preScrollX ? 'right' : 'left'
-          // that.arrowLeft = require('../../images/arrow-left.png')
-          // that.arrowRight = require('../../images/arrow-left.png')
-          // console.log(window.scrollX > that.preScrollX, that.scrollDirection)
+          let elContainer = document.documentElement
+          let initProgress = 15
+          // let elSmallMap = that.$refs.smallMap
+          // let ratio = elContainer.scrollWidth/elSmallMap.clientWidth
+          that.offsetLeft = initProgress + (elContainer.scrollLeft/elContainer.scrollWidth*100)
           that.ticking = false
         })
       }
       that.ticking = true
     },
     elementInViewport(el) {
-      // console.log('el->', el)
       var rect = el.getBoundingClientRect()
-      // var diff = (rect.left + el.width/2) - (window.innerWidth/2 || document.documentElement.clientWidth/2)
-      console.log('xxx->', rect.left, window.innerWidth/2 )
-      //return diff <= 2 && diff >= -2
-      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width/2
+      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width/4
     },
     async getHotCities() {
-      console.log('111res->')
       var res = await service.getHotCities()
-      console.log('res->', res)
       // this.hotCities = res.data
     },
     openUpload (isBigger) {
@@ -409,10 +404,10 @@ export default {
   animation: breathing 2s ease-out normal;
 }
 
-@tops: 5.36rem, 5.06rem, 8.7rem, 4.09rem, 3.03rem, 4.95rem, 5.11rem, 7.3rem,
+@tops: 5.36rem, 5.06rem, 8.7rem, 4.09rem, 2.5rem, 4.95rem, 5.11rem, 7.3rem,
   6.05rem, 6.85rem, 5.63rem, 7.79rem, 6.52rem, 5.23rem, 8.68rem;
 
-@lefts: 3.69rem, 5.97rem, 6.6rem, 9.92rem, 10.81rem, 10.79rem, 11.73rem, 11.98rem,
+@lefts: 3.69rem, 5.97rem, 6.6rem, 9.92rem, 11.1rem, 10.79rem, 11.73rem, 11.98rem,
   12.98rem, 15.4rem, 15.87rem, 16.08rem, 16.61rem, 17.39rem, 18.12rem;
 .loop(@n) when (@n < 16) {
   @mp-top: extract(@tops, @n);
