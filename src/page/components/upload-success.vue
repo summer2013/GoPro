@@ -3,7 +3,7 @@
     <div class="upload-success-content">
       <img src="../../images/close.png" alt="close" class="close" @click="closeModal">
       <div class="upload-success-body">
-        <img src="../../images/111.jpg" alt="" style="height: 5.98rem;width:6.15rem;">
+        <img :src="currentUploadFile.path" alt="" style="height: 5.98rem;width:6.15rem;">
         <div class="mask"></div>
         <img src="../../images/success.png" alt="" class="success">
         <p>上传成功</p>
@@ -26,6 +26,7 @@
     computed: {
       ...mapGetters({
         visibleUploadSuccess: 'visibleUploadSuccess',
+        currentUploadFile: 'currentUploadFile'
       })
     },
     watch: {

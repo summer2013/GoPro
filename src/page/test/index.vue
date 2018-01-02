@@ -4,7 +4,6 @@
     <button @click="setVisible('SET_VISIBLE_SUBMIT', visibleSubmit, true)">打开提交</button>
     <button @click="setVisible('SET_VISIBLE_UPLOAD_SUCCESS', visibleUploadSuccess, true)">打开上传成功</button>
     <button @click="setVisible('PHOTO_WALL', visiblePhotoWall, true)">打开照片墙</button>
-    <!--<input type="file" accept="image/*,video/*">-->
     <upload></upload>
     <submit></submit>
     <upload-success></upload-success>

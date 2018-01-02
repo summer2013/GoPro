@@ -13,14 +13,10 @@
       </div>
       <div class="photo-body">
         <div class="left">
-          <img src="../../images/111.jpg" alt="" @click="viewImage">
-          <img src="../../images/222.jpg" alt="" @click="viewImage">
-          <img src="../../images/333.jpg" alt="">
-          <img src="../../images/111.jpg" alt="">
+          <img v-for="img in leftImgList" :src="img.path" alt="" v-if="img.type === 'image'" @click="viewImage"/>
         </div>
         <div class="right">
-          <img src="../../images/333.jpg" alt="">
-          <img src="../../images/111.jpg" alt="">
+          <img v-for="img in rightImgList" :src="img.path" alt="" v-if="img.type === 'image'" @click="viewImage"/>
         </div>
       </div>
     </div>
@@ -31,22 +27,27 @@
 </template>
 <script>
   import { mapGetters } from 'vuex'
+  import Service from '../../config/service'
   export default {
     computed: {
       ...mapGetters({
         visiblePhotoWall: 'visiblePhotoWall',
+        currentArea: 'currentArea'
       })
     },
     data () {
       return {
         currentSrc: null,
-        showViewImage: false
+        showViewImage: false,
+        leftImgList: [],
+        rightImgList: []
       }
     },
     watch: {
       visiblePhotoWall (newval, oldval) {
         if (newval !== oldval && newval) {
           this.$nextTick(()=>{
+            this.getRecordList({area: this.currentArea, type: 1})
             setTimeout(()=> {
               this.$refs.modal.style.opacity = 1
               this.$refs.modal.style.transition = 'all 1s'
@@ -56,6 +57,107 @@
       }
     },
     methods: {
+      async getRecordList (data) {
+        const res = await Service.getRecordList(data)
+        if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
+          alert('获取记录失败,' + res.message)
+          return
+        }
+       /* res.data = [
+          {
+            id: "1",
+            type: "image",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test111111111111",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "23",
+            path: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/e60fe05ae90af6489615de796f2a6daa.png",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          },{
+            id: "7",
+            type: "image",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test222222222222",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "253",
+            path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/image\/20180102\/2ba7d8ffbd570f7ceb35d1a1895d0cc9.jpg",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          },{
+            id: "11",
+            type: "video",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test33333333333",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "363",
+            path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/video\/20180102\/92c184b27a53f04e141c83825a69e43c.mp4",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          },{
+            id: "17",
+            type: "image",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test44444444444",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "52",
+            path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/image\/20180102\/adb0ac5db252bca4d6f6c454a65c009d.jpg",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          },{
+            id: "12",
+            type: "video",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test55555555555555555555",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "36",
+            path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/video\/20180102\/a7d833c0492608046bae4c89c59cad6d.mp4",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          },{
+            id: "18",
+            type: "image",
+            images: "3",
+            nick: "Test1",
+            name: "Test1",
+            content: "Test66666666666666666",
+            top: "1",
+            area: "3",
+            examine: "1",
+            created: "1514860676",
+            extime: "1514860676",
+            like: "2",
+            path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/image\/20180102\/452f833b8f7878b5cabd81af62a1baaf.jpg",
+            thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
+          }]*/
+        this.leftImgList = res.data.slice(0, Math.ceil(res.data.length / 2) - 1)
+        this.rightImgList = res.data.slice(Math.ceil(res.data.length / 2), res.data.length - 1)
+      },
       closeModal () {
         this.$refs.modal.style.opacity = 0
         this.$refs.modal.style.transition = '1s'

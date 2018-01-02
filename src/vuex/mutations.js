@@ -8,8 +8,10 @@ const state = {
   tbId: null,
   currentUploadFile: {
     images: null,
-    type: null
-  }
+    type: null,
+    path: null
+  },
+  currentArea: null
 }
 const mutations = {
   [type.SET_VISIBLE_UPLOAD] (state, data) {
@@ -30,11 +32,15 @@ const mutations = {
   [type.PHOTO_WALL] (state, data) {
     state.visiblePhotoWall = data
   },
-  [type.CURRENT_UPLOAD_FILE] (state, id, uploadType) {
+  [type.CURRENT_UPLOAD_FILE] (state, id, uploadType, path) {
     state.currentUploadFile = {
       images: id,
-      type: uploadType
+      type: uploadType,
+      path: path
     }
+  },
+  [type.SET_CURRENT_AREA] (state, data) {
+    state.currentArea = data
   }
 }
 export default {

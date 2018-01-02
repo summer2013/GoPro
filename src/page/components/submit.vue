@@ -11,6 +11,7 @@
   </div>
 </template>
 <script type="text/ecmascript-6">
+  import Service from '../../config/service'
   import { mapGetters } from 'vuex'
   import uploadSuccess from './upload-success'
   export default {
@@ -30,6 +31,7 @@
       visibleSubmit (newval, oldval) {
         if (newval !== oldval && newval) {
           this.$nextTick(()=>{
+          	this.getTbId()
             setTimeout(()=> {
               this.$refs.modal.style.opacity = 1
               this.$refs.modal.style.transition = 'all 1s'
@@ -99,15 +101,18 @@
           type: this.currentUploadFile.type
         }
         this.saveRecord(params)
+      },
+      getTbId () {
+        if (this.tbId === null) {
+          this.getUserInfo({nick: this.mixNick})
+        } else {
+          this.taoBaoId = this.tbId
+          //this.disableTbId = true
+        }
       }
     },
     mounted () {
-      if (this.tbId === null) {
-        this.getUserInfo({nick: this.mixNick})
-      } else {
-        this.taoBaoId = this.tbId
-        //this.disableTbId = true
-      }
+
     }
   }
 </script>
