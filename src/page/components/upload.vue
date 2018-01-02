@@ -4,10 +4,6 @@
       <img src="../../images/close.png" alt="close" class="close" @click="closeModal">
       <div class="upload-body" ref="uploadBody">
         <ul class="img-container" ref="imgContainer" v-if="imgList.length > 0">
-          <!--<li><img src="../../images/111.jpg" alt=""></li>
-          <li><img src="../../images/222.jpg" alt=""></li>
-          <li><img src="../../images/333.jpg" alt=""></li>
-          <li><img src="../../images/111.jpg" alt=""></li>-->
           <li v-for="img in imgList">
             <img :src="img.path" alt="" v-if="img.type === 'image'" />
             <video :src="img.path" controls="controls" v-if="img.type === 'video'" ></video>
@@ -23,7 +19,13 @@
       </div>
       <div class="upload-footer">
         <div class="upload-footer-top">
-          <p><img src="../../images/heart.png" alt="" @click="like"><span>{{likes}}</span></p>
+          <p v-if="imgList.length > 0">
+            <span>
+              <img src="../../images/heart.png" alt="" @click="like" v-if="!likeImgList.includes(imgList[infoIndex].id.toString())">
+              <img ref="redHeart" src="../../images/heart-red.png" alt="" v-if="likeImgList.includes(imgList[infoIndex].id.toString())">
+            </span>
+            <span ref="likeNum">{{likes}}</span>
+          </p>
           <p>
             <ul>
               <li></li>
@@ -33,7 +35,7 @@
             <span @click="setVisible('PHOTO_WALL', visiblePhotoWall, true)">更多</span>
           </p>
         </div>
-        <span>{{comments}}</span>
+        <span ref="commentInfo">{{comments}}</span>
         <p>探索长滩海滩</p>
         <label for="upload" @change="upload()">上传你的脚步
           <input type="file" accept="image/*,video/mp4" id="upload" >
@@ -69,7 +71,8 @@
         visibleUpload: 'visibleUpload',
         visiblePhotoWall: 'visiblePhotoWall',
         visibleSubmit: 'visibleSubmit',
-        currentArea: 'currentArea'
+        currentArea: 'currentArea',
+        likeImgList: 'likeImgList',
       })
     },
     watch: {
@@ -77,7 +80,7 @@
         if (newval !== oldval && newval) {
          this.$nextTick(()=>{
            this.getRecordList({area: this.currentArea, type: 2})
-           this.getNickId()
+           //this.getNickId()
            setTimeout(()=> {
              this.$refs.modal.style.opacity = 1
              this.$refs.modal.style.transition = 'all 1s'
@@ -104,6 +107,9 @@
         }
         this.imgList[this.infoIndex].like ++
         this.likes ++
+        this.likeImgList.push(data.id.toString())
+        this.$store.commit('SET_LIKE_IMG_LIST', this.likeImgList)
+        this.transition('redHeart')
       },
       async getRecordList (data) {
         const res = await Service.getRecordList(data)
@@ -204,7 +210,17 @@
           thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
         }]*/
         this.imgList = res.data
-        this.setLikeAndComment(this.index)
+        this.setLikeAndComment(this.infoIndex)
+      },
+      transition (ele) {
+        this.$nextTick(()=>{
+          this.$refs[ele].style.opacity = 0
+          this.$refs[ele].style.transition = 'all 0s'
+          setTimeout(()=> {
+            this.$refs[ele].style.opacity = 1
+            this.$refs[ele].style.transition = 'all 1.5s'
+          },0)
+        })
       },
       setLikeAndComment (index) {
         this.likes = this.imgList[index].like
@@ -245,6 +261,8 @@
           this.$refs.imgContainer.style.marginLeft = -6.15 * this.index + 'rem'
           this.$refs.imgContainer.style.transition = '1s'
         }
+        this.transition('likeNum')
+        this.transition('commentInfo')
         this.setLikeAndComment(this.infoIndex)
       },
       closeModal () {
@@ -381,6 +399,7 @@
         display: block;
         text-align: center;
         font-size: .24rem;
+        height: .24rem;
         line-height: .24rem;
         margin-top: .15rem;
        }
@@ -389,7 +408,7 @@
       font-size: .34rem;
       color:#01b8fe;
       text-align: center;
-      margin-top: .3rem;
+      margin-top: .28rem;
     }
     .upload-footer>label{
       display: block;
@@ -411,9 +430,12 @@
       padding-left: .42rem;
       font-size:.22rem;
       img{
-        width:.29rem;
-        height:.26rem;
-        padding-right: .1rem;
+        width: 100%;
+        height:100%;
+        position: absolute;
+        top:50%;
+        left:50%;
+        transform: translate(-50%,-50%);
       }
       span,img{
         vertical-align: middle;
@@ -434,8 +456,18 @@
       p{
         display: inline-block;
       }
-      &>p:nth-child(2){
-        margin-left: .32rem;
+      &>p:nth-child(1){
+        span:nth-child(2){
+          display: inline-block;
+          width:.6rem
+        }
+        span:nth-child(1){
+          display: inline-block;
+          width:.3rem;
+          height:.27rem;
+          font-size: 0;
+          position: relative;
+        }
       }
     }
   }

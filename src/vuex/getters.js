@@ -6,4 +6,5 @@ export const visiblePhotoWall = state => state.visiblePhotoWall
 export const currentUploadFile = state => state.currentUploadFile
 export const tbId = state => state.tbId
 export const currentArea = state => state.currentArea
+export const likeImgList = state => state.likeImgList
 

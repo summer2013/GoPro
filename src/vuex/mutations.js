@@ -11,7 +11,8 @@ const state = {
     type: null,
     path: null
   },
-  currentArea: null
+  currentArea: null,
+  likeImgList: []
 }
 const mutations = {
   [type.SET_VISIBLE_UPLOAD] (state, data) {
@@ -41,6 +42,9 @@ const mutations = {
   },
   [type.SET_CURRENT_AREA] (state, data) {
     state.currentArea = data
+  },
+  [type.SET_LIKE_IMG_LIST] (state, data) {
+    state.likeImgList = data
   }
 }
 export default {

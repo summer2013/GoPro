@@ -32,7 +32,8 @@
     computed: {
       ...mapGetters({
         visiblePhotoWall: 'visiblePhotoWall',
-        currentArea: 'currentArea'
+        currentArea: 'currentArea',
+        likeImgList: 'likeImgList'
       })
     },
     data () {
