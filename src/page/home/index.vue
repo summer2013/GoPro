@@ -32,7 +32,7 @@
         <div class="map-container">
           <img class="map" src="../../images/bg.jpg" alt="">
           <div v-show="!hideMapElement" :class="'map-hot-' + (index+1)" v-for="(item,index) in hots" @click="tapHot" :key="index">
-            <img v-bind:data-idx="index+1" :ref="'mh' + (index+1)" v-bind:class="{bigger: biggerIdx == (index+1)}" :src="item.url">
+            <img v-bind:data-idx="index+1" :ref="'mh' + (index+1)" v-bind:class="{bigger: biggerIdx == (index+1)}" :src="item.url" @click="openUpload(biggerIdx == (index+1))">
             <div class="sprite" v-bind:class="{'sprite-bigger': biggerIdx == (index+1)}"></div>
             <!-- <div v-show="biggerIdx != (index+1)" class="sprite"></div> -->
             <!-- <div v-show="biggerIdx == (index+1)" class="sprite-bigger"></div> -->
@@ -44,13 +44,19 @@
       <div v-bind:class="{hide: hideMapElement}" class="bottom-dialog h-center" v-show="showPage3">
         <span class="absolute-center">探索不止 <br> #猫眼看世界#</span>
       </div>
+      <upload></upload>
     </div>
 </template>
 
 <script>
+import upload from '../components/upload'
+import service from '../../config/service.js'
 export default {
   name: "home",
   created() {},
+  components: {
+   upload
+  },
   data() {
     return {
       arrowLeft: require('../../images/arrow-right.png'),
@@ -165,13 +171,26 @@ export default {
     elementInViewport(el) {
       // console.log('el->', el)
       var rect = el.getBoundingClientRect()
-      var diff = (rect.left + rect.width/2) - (window.innerWidth/2 || document.documentElement.clientWidth/2)
-      console.log('xxx->', diff)
-      return diff <= 2 && diff >= -2
+      // var diff = (rect.left + el.width/2) - (window.innerWidth/2 || document.documentElement.clientWidth/2)
+      console.log('xxx->', rect.left, window.innerWidth/2 )
+      //return diff <= 2 && diff >= -2
+      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width
+    },
+    async getHotCities() {
+      console.log('111res->')
+      var res = await service.getHotCities()
+      console.log('res->', res)
+      // this.hotCities = res.data
+    },
+    openUpload (isBigger) {
+      if (isBigger) {
+        this.$store.commit('SET_VISIBLE_UPLOAD', true)
+      }
     }
   },
   mounted () {
     this.hots = this.hots
+    this.getHotCities()
     this.preload(this.urls, this.updateProgress)
   },
   created () {
