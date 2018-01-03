@@ -6,57 +6,59 @@
         <p class="desc t1">和GoPro一起猫眼看世界...</p>
       </div>
       <div class="flex-column-center p2" v-if="showPage2">
-        <div class="dialog-bg">
+        <div class="dialog-bg" ref="showPage2">
           <p class="t2">欢迎进入GoPro探索世界</p>
           <p class="t3">移动手机查看世界探索地图 <br>与大家一起互动</p>
           <img class="btn-go" src="../../images/btn1.png" @click="showMap">
         </div>
       </div>
-      <div class="p3 p4" v-show="showPage3">
+      <div class="p3 p4" v-show="showPage3" ref="showPage3">
         <img
         class="left"
-        v-bind:class="{hide: hideMapElement, breathing: scrollDirection === 'left'}"
+        v-bind:class="{breathing: scrollDirection === 'left'}"
         v-bind:src="scrollDirection === 'left' ? require('../../images/arrow-left-green.png') : require('../../images/arrow-left.png')">
         <img
         class="right"
-        v-bind:class="{hide: hideMapElement, breathing: scrollDirection === 'right'}"
+        v-bind:class="{breathing: scrollDirection === 'right'}"
         v-bind:src="scrollDirection === 'right' ? require('../../images/arrow-right-green.png') : require('../../images/arrow-right.png')">
         <div v-bind:class="{hide: !hideMapElement}" class="center h-center">
           <span class="text absolute-center">移动地图<br>探索精彩世界</span>
         </div>
         <div v-bind:class="{hide: hideMapElement}" class="line h-center"></div>
-        <p v-bind:class="{hide: hideMapElement}" class="position-text">{{biggerIdx && hots[biggerIdx-1].text}}</p>
+        <p v-bind:class="{hide: hideMapElement}" class="position-text">{{title}}</p>
         <div v-bind:class="{hide: hideMapElement}" class="small-map h-center" ref="smallMap">
-          <div class="small-map-position" v-bind:style="{left: offsetLeft+'%'}"></div>
+          <div class="small-map-position" v-bind:style="{left: offsetLeft}"></div>
         </div>
         <div class="map-container" ref="mapContainer">
           <img class="map" src="../../images/bg.jpg" alt="">
-          <div v-show="!hideMapElement" :class="'map-hot-' + (index+1)" v-for="(item,index) in hots" @click="tapHot" :key="index">
-            <img v-bind:data-idx="index+1" :ref="'mh' + (index+1)" v-bind:class="{bigger: biggerIdx == (index+1)}" :src="item.url" @click="openUpload(biggerIdx == (index+1))">
-            <!-- <div class="sprite" v-bind:class="{'sprite-bigger': biggerIdx == (index+1)}"></div> -->
+          <div v-show="!hideMapElement" class="map-hot" v-for="(item,index) in hots" @click="tapHot" :key="index" :style={top:item.top,left:item.left} :ref="'hotPoint' + (index+1)">
+            <img :ref="'mh' + (index+1)" :src="item.url" @click="openUpload(index)">
             <div class="sprite"></div>
-            <!-- <div v-show="biggerIdx != (index+1)" class="sprite"></div> -->
-            <!-- <div v-show="biggerIdx == (index+1)" class="sprite-bigger"></div> -->
           </div>
-          <!-- <img :class="'map-hot-' + (index+1)" :src="img" alt="" v-for="(img,index) in hots" @click="tapHot"> -->
         </div>
       </div>
 
-      <div v-bind:class="{hide: hideMapElement}" class="bottom-dialog h-center" v-show="showPage3">
-        <span class="absolute-center">探索不止 <br> #猫眼看世界#</span>
+      <div class="bottom-dialog h-center" v-show="showPage3">
+        <span>探索不止<br>你的人生够了吗？</span>
       </div>
       <upload></upload>
+      <submit></submit>
+      <upload-success></upload-success>
     </div>
 </template>
 
 <script>
 import upload from '../components/upload'
+import submit from '../components/submit'
+import uploadSuccess from '../components/upload-success'
 import service from '../../config/service.js'
 export default {
   name: "home",
   created() {},
   components: {
-   upload
+    upload,
+    submit,
+    uploadSuccess
   },
   data() {
     return {
@@ -74,7 +76,7 @@ export default {
       selectedIdx: 0,
       loadedCount: 0,
       biggerIdx: undefined,
-      offsetLeft: 13,
+      offsetLeft: 0,
       urls: [
         require("../../images/bg.jpg"),
         require("../../images/bg1.jpg"),
@@ -84,22 +86,24 @@ export default {
       preLoaded: false, // 预加载是否完成
       isMobile: true,
       hots: [
-        {url: require("../../images/mg.png"), selected: false, text:"W 118°14 洛杉矶", id: 5},
-        {url: require("../../images/mg.png"), selected: false, text: "W 74°0 纽约", id: 6},
-        {url: require("../../images/agt.png"), selected: false, text: "E 12°10 阿根廷", id:4},
-        {url: require("../../images/ld.png"), selected: false, text: "W 0° 7 伦敦", id:14},
-        {url: require("../../images/rd.png"), selected: false, text: "E 18°03 瑞典", id:13},
-        {url: require("../../images/ydl.png"), selected: false, text: "E 11°15 意大利", id:8},
-        {url: require("../../images/teq.png"), selected: false, text: "E 32°54 土耳其", id:7},
-        {url: require("../../images/kny.png"), selected: false, text: "E 36°49 肯尼亚", id:2},
-        {url: require("../../images/db.png"), selected: false, text: "E 55°18 阿拉伯联合酋长国", id:3},
-        {url: require("../../images/pj.png"), selected: false, text: "E 98°20 普吉岛", id:10},
-        {url: require("../../images/zg.png"), selected: false, text: "E 104°21 中国", id:11},
-        {url: require("../../images/bld.png"), selected: false, text: "E 115° 14'E 巴厘岛", id:9},
-        {url: require("../../images/ct.png"), selected: false, text: "E 114°37 长滩", id:15},
-        {url: require("../../images/dj.png"), selected: false, text: "E 139°69 日本", id:12},
-        {url: require("../../images/adly.png"), selected: false, text: "E 150°53 澳大利亚", id:1}
-      ]
+        {url: require("../../images/mg.png"), selected: false, text:"W 118°14 洛杉矶", top: (705 * window.innerHeight / 1309) + 'px', left: (400 * window.innerHeight / 1309) + 'px', name: '洛杉矶'},
+        {url: require("../../images/mg.png"), selected: false, text: "W 74°0 纽约", top: (670 * window.innerHeight / 1309) + 'px', left: (627 * window.innerHeight / 1309) + 'px', name: '纽约'},
+        {url: require("../../images/agt.png"), selected: false, text: "E 12°10 阿根廷", top: (1112 * window.innerHeight / 1309) + 'px', left: (667 * window.innerHeight / 1309) + 'px', name: '阿根廷'},
+        {url: require("../../images/ld.png"), selected: false, text: "W 0° 7 伦敦", top: (573 * window.innerHeight / 1309) + 'px', left: (1025 * window.innerHeight / 1309) + 'px', name: '伦敦'},
+        {url: require("../../images/rd.png"), selected: false, text: "E 18°03 瑞典", top: (465 * window.innerHeight / 1309) + 'px', left: (1114 * window.innerHeight / 1309) + 'px', name: '瑞典'},
+        {url: require("../../images/ydl.png"), selected: false, text: "E 11°15 意大利", top: (660 * window.innerHeight / 1309) + 'px', left: (1108 * window.innerHeight / 1309) + 'px', name: '意大利'},
+        {url: require("../../images/teq.png"), selected: false, text: "E 32°54 土耳其", top: (678 * window.innerHeight / 1309) + 'px', left: (1202 * window.innerHeight / 1309) + 'px', name: '土耳其'},
+        {url: require("../../images/kny.png"), selected: false, text: "E 36°49 肯尼亚", top: (901 * window.innerHeight / 1309) + 'px', left: (1227 * window.innerHeight / 1309) + 'px', name: '肯尼亚'},
+        {url: require("../../images/db.png"), selected: false, text: "E 55°18 阿拉伯联合酋长国", top: (768 * window.innerHeight / 1309) + 'px', left: (1327 * window.innerHeight / 1309) + 'px', name: '阿拉伯联合酋长国'},
+        {url: require("../../images/pj.png"), selected: false, text: "E 98°20 普吉岛", top: (853 * window.innerHeight / 1309) + 'px', left: (1572 * window.innerHeight / 1309) + 'px', name: '普吉岛'},
+        {url: require("../../images/zg.png"), selected: false, text: "E 104°21 中国", top: (734 * window.innerHeight / 1309) + 'px', left: (1609 * window.innerHeight / 1309) + 'px', name: '中国'},
+        {url: require("../../images/bld.png"), selected: false, text: "E 115° 14'E 巴厘岛", top: (947 * window.innerHeight / 1309) + 'px', left: (1644 * window.innerHeight / 1309) + 'px', name: '巴厘岛'},
+        {url: require("../../images/ct.png"), selected: false, text: "E 114°37 长滩", top: (826 * window.innerHeight / 1309) + 'px', left: (1699 * window.innerHeight / 1309) + 'px', name: '长滩'},
+        {url: require("../../images/dj.png"), selected: false, text: "E 139°69 日本", top: (691 * window.innerHeight / 1309) + 'px', left: (1773 * window.innerHeight / 1309) + 'px', name: '日本'},
+        {url: require("../../images/adly.png"), selected: false, text: "E 150°53 澳大利亚", top: (1029 * window.innerHeight / 1309) + 'px', left: (1839 * window.innerHeight / 1309) + 'px', name: '澳大利亚'}
+      ],
+      hotCities: [],
+      title: ''
     }
   },
   computed: {
@@ -108,6 +112,7 @@ export default {
       if (tmp === 100) {
         this.preLoaded = true
         this.showPage2 = true
+        this.transition('showPage2')
       }
       return tmp + "%"
     }
@@ -130,59 +135,84 @@ export default {
       let that = this
       setTimeout(() =>{
         that.loadedCount += 1
-        console.log('updateProgress')
       }, 1000)
     },
     showMap() {
       let that = this
       this.showPage2 = false
       this.showPage3 = true
+      this.transition('showPage3')
+      this.$refs.mapContainer.style.width = (2240 * window.innerHeight / 1309) + 'px'
       setTimeout(() => {
         that.hideMapElement = false
       }, 1000)
     },
     toBigger(index) {
       this.biggerIdx = index
-      // console.log('index->', this.biggerIdx)
     },
     handleScroll(event) {
       var that = this
       if (!that.ticking) {
         window.requestAnimationFrame(function() {
-          for (let ref in that.$refs) {
-            var el = that.$refs[ref][0]
-            if (el && that.biggerIdx != el.dataset.idx && that.elementInViewport(el)) {
-              that.biggerIdx = el.dataset.idx
-              console.log('happy!', that.biggerIdx)
+          let arr = []
+          for( let i = 1; i<= 15; i++ ){
+            let index = 'mh' + i
+            if (that.$refs[index] && that.elementInViewport(that.$refs[index][0])) {
+              arr.push(i)
+            }
+          }
+          for( let j = 0; j< arr.length; j++ ){
+            let a = 'hotPoint' + arr[j]
+            that.$refs[a][0].classList.add('hot-transition')
+          }
+          that.title = arr.length === 0 ? '' : that.hots[arr[0]-1].text
+          for( let i = 1; i<= 15; i++ ){
+            let b = 'hotPoint' + i
+            if(!arr.includes(i)){
+              that.$refs[b][0].classList.remove('hot-transition')
             }
           }
           that.scrollDirection = window.scrollX > that.preScrollX ? 'right' : 'left'
-          let elContainer = document.documentElement
-          let initProgress = 15
-          // let elSmallMap = that.$refs.smallMap
-          // let ratio = elContainer.scrollWidth/elSmallMap.clientWidth
-          that.offsetLeft = initProgress + (elContainer.scrollLeft/elContainer.scrollWidth*100)
+          let w = (2240 * window.innerHeight / 1309) - (window.innerWidth )
+          let a = 0.3/4.5
+          that.offsetLeft = ((document.body.scrollLeft / w)-a)* 100
+          if(that.offsetLeft < 0){
+            that.offsetLeft = 0
+          }
+          that.offsetLeft = that.offsetLeft +'%'
           that.ticking = false
         })
       }
       that.ticking = true
     },
     elementInViewport(el) {
-      var rect = el.getBoundingClientRect()
-      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width/4
+      let rect = el.getBoundingClientRect()
+      return  Math.abs(window.innerWidth/2 - rect.left) <= el.width/2
     },
     async getHotCities() {
-      var res = await service.getHotCities()
-      // this.hotCities = res.data
+      let res = await service.getHotCities()
+      this.hotCities = res.data
     },
-    openUpload (isBigger) {
-      if (isBigger) {
+    openUpload (index) {
+      let a = 'hotPoint' + (index +1)
+      if (this.$refs[a][0].className.includes('hot-transition')) {
         this.$store.commit('SET_VISIBLE_UPLOAD', true)
+        let b = this.hotCities.findIndex((item) => item.name === this.hots[index].name)
+        this.$store.commit('SET_CURRENT_AREA', {id: parseInt(this.hotCities[b].id), name: this.hotCities[b].name})
       }
+    },
+    transition (ele) {
+      this.$nextTick(()=>{
+        this.$refs[ele].style.opacity = 0
+        this.$refs[ele].style.transition = 'all 0s'
+        setTimeout(()=> {
+          this.$refs[ele].style.opacity = 1
+          this.$refs[ele].style.transition = 'all 1.5s'
+        },0)
+      })
     }
   },
   mounted () {
-    this.hots = this.hots
     this.getHotCities()
     this.preload(this.urls, this.updateProgress)
   },
@@ -205,17 +235,12 @@ export default {
   transition: all .5s;
 }
 
-#app,
-#app > div,
-.home_container {
+#app, #app > div, .home_container {
   width: 100vw;
   height: 100vh;
 }
 
-.p1,
-.p2,
-.p3,
-.p4 {
+.p1, .p2, .p3, .p4 {
   height: 100%;
   width: 100%;
 }
@@ -259,6 +284,7 @@ export default {
   width: 6.24rem;
   height: 3.88rem;
   text-align: center;
+  background-color: #fff;
 }
 
 .p2 .t2 {
@@ -278,8 +304,7 @@ export default {
   height: 1rem;
 }
 
-.p3 .left,
-.p3 .right {
+.p3 .left, .p3 .right {
   position: fixed;
   top: 6rem;
   width: 1.12rem;
@@ -289,16 +314,10 @@ export default {
 
 .p3 .left {
   left: 0.8rem;
-  // transform: rotate(180deg);
 }
 
 .p3 .right {
   right: 0.8rem;
-}
-
-
-.p3 .right.breathing {
-  // transform: rotate(180deg);
 }
 
 .p3 .center {
@@ -316,64 +335,60 @@ export default {
 }
 
 .bottom-dialog {
-  width: 6.26rem;
-  height: 2.15rem;
+  width: 6.15rem;
+  height: 2.57rem;
   position: fixed;
   bottom: 0.3rem;
-  background: url("../../images/bottom-dialog.png") 100% 100% no-repeat;
+  background: url("../../images/dialog.png") 100% 100% no-repeat;
   background-size: contain;
   font-size: 0.56rem;
   z-index: 2;
 
   > span {
-    width: 100%;
+    display: block;
     text-align: center;
+    padding-top: .8rem;
   }
 }
 
 .p3 span.absolute-center {
   width: 100%;
   text-align: center;
+  font-family: 'TextPro-Bold';
 }
 
-// .p4 {
-//   overflow: scroll;
-//   box-sizing: border-box;
-// }
-
 .p4 .map {
-  // height: 100%;
-  width: 22.40rem;
+  height: 100%;
+  width:100%;
 }
 
 .map-container {
   position: relative;
+  height:100%;
+  //overflow-y: hidden;
 }
 
 [class|="map-hot"] {
   position: absolute;
-  // width: 0.53rem;
-  // height: 0.65rem;
-  // background-image: url('../../images/position-box.png');
-  // background-size: contain;
-  // background-repeat: no-repeat;
-  display: flex;
-  display: -webkit-flex;
-  justify-content: center;
-  -webkit-justify-content: center;
-  // transition: 1s transform ease-in;
+  width: .52rem;
+  height: .62rem;
+  transform: translate(-50%,-100%);
+  transition: all 1s;
+  font-size: 0;
   z-index: 3;
 }
-
-// [class|="map-hot"].bigger{
-//   width: 2.33rem;
-//   height: 3.24rem;
-// }
-
-[class|="map-hot"] > img {
-  width: 0.5rem;
-  height: 0.6rem;
-  z-index: 2;
+.map-hot.hot-transition{
+  position: absolute;
+  width: 1.04rem;
+  height: 1.24rem;
+  transform: translate(-50%,-100%);
+  transition: all 1s;
+  font-size: 0;
+  z-index: 3;
+}
+[class|="map-hot"] > img, .hot-transition>img {
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes breathing {
@@ -392,11 +407,18 @@ export default {
     opacity: 1;
   }
 
-  100% {
+  50% {
     -webkit-transform: scale(0.8);
     -ms-transform: scale(0.8);
     transform: scale(0.8);
     opacity: .8;
+  }
+
+  100% {
+    -webkit-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -424,7 +446,6 @@ export default {
 .loop(1);
 
 .line {
-  // border: 1px solid #91a6bb;
   width: 2px;
   height: 10rem;
   position: fixed;
@@ -439,8 +460,8 @@ export default {
   z-index: 1;
   position: fixed;
   top: 0.68rem;
-  background-image: url('../../images/small-map.png');
-  background-size: contain;
+  background: url('../../images/small-map.png') no-repeat;
+  background-size: 100% 100%;
 }
 
 .position-text {
@@ -465,31 +486,27 @@ export default {
   left: 20%;
 }
 
-// @spriteWidth: 10vw; // 精灵宽度
 @spriteWidth: 40px; // 精灵宽度
-// @spriteWidth: 40px; // 精灵宽度
 @keyframes run {
   0% {
     background-position: 0 0;
   }
   100% {
-    background-position: -(@spriteWidth * 15) 0; // 15帧
+    background-position: -(@spriteWidth * 15) 0;
   }
 }
 .sprite {
   width: @spriteWidth;
-  // height: 5vw;
-  // height: 2.6vw;
   height: 20px;
   background: url("../../images/sprite.png") 0 0 no-repeat;
   animation: run 1.2s steps(15) infinite;
   background-size: cover;
   z-index: 1;
-  width: @spriteWidth;
   position: absolute;
-  bottom: -4.75vw;
-  // bottom: -15px;
+  bottom: 10%;
+  left:50%;
   transition: all 1s;
+  transform: translate(-50%,100%);
 }
 
 .sprite-bigger {

@@ -5,13 +5,16 @@ const state = {
   visibleUploadSuccess: false,
   visiblePhotoWall: false,
   mixNick: null,
-  tbId: null,
+  tbId: 'colinjune',
   currentUploadFile: {
     images: null,
     type: null,
     path: null
   },
-  currentArea: null,
+  currentArea: {
+    id: null,
+    name: null
+  },
   likeImgList: []
 }
 const mutations = {
@@ -33,12 +36,8 @@ const mutations = {
   [type.PHOTO_WALL] (state, data) {
     state.visiblePhotoWall = data
   },
-  [type.CURRENT_UPLOAD_FILE] (state, id, uploadType, path) {
-    state.currentUploadFile = {
-      images: id,
-      type: uploadType,
-      path: path
-    }
+  [type.CURRENT_UPLOAD_FILE] (state, data) {
+    state.currentUploadFile = data
   },
   [type.SET_CURRENT_AREA] (state, data) {
     state.currentArea = data

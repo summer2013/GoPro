@@ -48,7 +48,7 @@
       visiblePhotoWall (newval, oldval) {
         if (newval !== oldval && newval) {
           this.$nextTick(()=>{
-            this.getRecordList({area: this.currentArea, type: 1})
+            this.getRecordList({area: this.currentArea.id, type: 1})
             setTimeout(()=> {
               this.$refs.modal.style.opacity = 1
               this.$refs.modal.style.transition = 'all 1s'
@@ -156,8 +156,12 @@
             path: "http:\/\/gopro.ews.m.jaeapp.com\/uploads\/image\/20180102\/452f833b8f7878b5cabd81af62a1baaf.jpg",
             thumbpath: "http://gopro.ews.m.jaeapp.com/uploads/image/20180102/thumb/thumb_e60fe05ae90af6489615de796f2a6daa.png"
           }]*/
-        this.leftImgList = res.data.slice(0, Math.ceil(res.data.length / 2) - 1)
-        this.rightImgList = res.data.slice(Math.ceil(res.data.length / 2), res.data.length - 1)
+        if(res.data.length === 1){
+          this.leftImgList = res.data
+        }else{
+          this.leftImgList = res.data.slice(0, Math.ceil(res.data.length / 2) - 1)
+          this.rightImgList = res.data.slice(Math.ceil(res.data.length / 2), res.data.length - 1)
+        }
       },
       closeModal () {
         this.$refs.modal.style.opacity = 0

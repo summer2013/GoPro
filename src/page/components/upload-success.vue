@@ -3,7 +3,7 @@
     <div class="upload-success-content">
       <img src="../../images/close.png" alt="close" class="close" @click="closeModal">
       <div class="upload-success-body">
-        <img :src="currentUploadFile.path" alt="" style="height: 5.98rem;width:6.15rem;">
+        <img :src="currentUploadFile.path" alt="" style="height: 5.98rem;width:6.2rem;">
         <div class="mask"></div>
         <img src="../../images/success.png" alt="" class="success">
         <p>上传成功</p>
@@ -58,6 +58,7 @@
 </script>
 <style lang="less">
   .upload-success-modal{
+    z-index: 5;
     position: fixed;
     opacity: 0;
     top:0;
@@ -72,17 +73,18 @@
       top:50%;
       left:50%;
       transform: translate(-50%,-50%);
+      background-color: #fff;
     }
     .close{
       width:.62rem;
       height:.62rem;
       position: absolute;
-      right:0.05rem;
+      right:0;
       top:0;
       transform: translate(0,-120%);
     }
     .upload-success-body{
-      width:6.15rem;
+      width:6.2rem;
       height:5.98rem;
       position: relative;
       box-shadow:0rem .15rem .15rem rgba(0,0,0,.3);

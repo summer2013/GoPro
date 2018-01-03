@@ -1,5 +1,5 @@
 import ajax from './ajax'
-let baseUrl = 'http://gopro.ews.m.jaeapp.com/index.php'
+let baseUrl = 'https://gopro.ews.m.jaeapp.com/index.php'
 export default {
   //文件上传
   uploadFile (params) {

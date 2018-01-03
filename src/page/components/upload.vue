@@ -36,26 +36,23 @@
           </p>
         </div>
         <span ref="commentInfo">{{comments}}</span>
-        <p>探索长滩海滩</p>
-        <label for="upload" @change="upload()">上传你的脚步
-          <input type="file" accept="image/*,video/mp4" id="upload" >
+        <p>探索{{currentArea.name}}</p>
+        <label for="upload" @click="openSubmit()">上传你的脚步
+          <input type="button" id="upload" >
         </label>
       </div>
     </div>
     <photo-wall></photo-wall>
-    <submit></submit>
   </div>
 </template>
 <script type="text/ecmascript-6">
   import Service from '../../config/service'
   import Tida from '../../config/tida'
   import photoWall from './photo-wall'
-  import submit from './submit'
   import { mapGetters } from 'vuex'
   export default {
     components: {
-      photoWall,
-      submit
+      photoWall
     },
     data () {
   		return {
@@ -79,8 +76,7 @@
       visibleUpload (newval, oldval) {
         if (newval !== oldval && newval) {
          this.$nextTick(()=>{
-           this.getRecordList({area: this.currentArea, type: 2})
-           //this.getNickId()
+           this.getRecordList({area: this.currentArea.id, type: 2})
            setTimeout(()=> {
              this.$refs.modal.style.opacity = 1
              this.$refs.modal.style.transition = 'all 1s'
@@ -96,7 +92,7 @@
     			alert('上传失败,' + res.message)
           return
         }
-        this.$store.commit('CURRENT_UPLOAD_FILE', res.data.id, res.data.type, res.data.path)
+        this.$store.commit('CURRENT_UPLOAD_FILE', {images: res.data.id, type: res.data.type, path: res.data.path})
         this.setVisible('SET_VISIBLE_SUBMIT', this.visibleSubmit, true)
       },
       async likePhoto (data) {
@@ -115,6 +111,9 @@
         const res = await Service.getRecordList(data)
         if(!res || res.message.toString().toUpperCase() !== 'SUCCESS') {
           alert('获取记录失败,' + res.message)
+          return
+        }
+        if(res.data && res.data.length === 0) {
           return
         }
         /*res.data = [
@@ -227,7 +226,7 @@
         this.comments = this.imgList[index].content
       },
       play (dir) {
-        this.$refs.imgContainer.style.width = 6.15 * (this.imgList.length + 1) + 'rem'
+        this.$refs.imgContainer.style.width = 6.2 * (this.imgList.length + 1) + 'rem'
       	if(dir === 'right') {
       		this.index ++
           this.infoIndex ++
@@ -248,17 +247,17 @@
           this.index = 1
         }
         if(this.index < 0){
-          this.$refs.imgContainer.style.marginLeft = -6.15 * this.imgList.length + 'rem'
+          this.$refs.imgContainer.style.marginLeft = -6.2 * this.imgList.length + 'rem'
           this.$refs.imgContainer.style.transition = '0s'
           this.index = this.imgList.length -1
         }
         if(this.$refs.imgContainer.style.transition && this.$refs.imgContainer.style.transition === '0s'){
           setTimeout(()=> {
-            this.$refs.imgContainer.style.marginLeft = -6.15 * this.index + 'rem'
+            this.$refs.imgContainer.style.marginLeft = -6.2 * this.index + 'rem'
             this.$refs.imgContainer.style.transition = '1s'
           },0)
         }else{
-          this.$refs.imgContainer.style.marginLeft = -6.15 * this.index + 'rem'
+          this.$refs.imgContainer.style.marginLeft = -6.2 * this.index + 'rem'
           this.$refs.imgContainer.style.transition = '1s'
         }
         this.transition('likeNum')
@@ -282,6 +281,11 @@
         }else{
         	alert('只能选择图片或者视频')
         }
+      },
+      openSubmit () {
+        this.$store.commit('SET_VISIBLE_UPLOAD', false)
+        this.$store.commit('SET_VISIBLE_SUBMIT', true)
+        //this.this.getNickId()
       },
       setVisible (type, visible_type, isVisible) {
         visible_type = isVisible
@@ -328,17 +332,18 @@
       top:50%;
       left:50%;
       transform: translate(-50%,-50%);
+      background-color: #fff;
     }
     .close{
       width:.62rem;
       height:.62rem;
       position: absolute;
-      right:0.05rem;
+      right:0;
       top:0;
       transform: translate(0,-120%);
     }
     .upload-body{
-      width:6.15rem;
+      width:6.2rem;
       height:5.98rem;
       overflow: hidden;
       position: relative;
@@ -377,7 +382,7 @@
       li{
         display: inline-block;
         height: 5.98rem;
-        width:6.15rem;
+        width:6.2rem;
         position: relative;
         overflow: hidden;
       }
@@ -395,6 +400,7 @@
       width:100%;
       height:3.6rem;
       background: url('../../images/upload-1.png') no-repeat;
+      background-color: #fff;
       background-size: contain;
       &>span{
         display: block;
@@ -417,9 +423,9 @@
       color:#fff;
       text-align: center;
       width:5.19rem;
-      height:.98rem;
+      height:1rem;
       margin: 0 auto;
-      line-height: .98rem;
+      line-height: 1rem;
       margin-top: .15rem;
       padding-left: .5rem;
       input{
